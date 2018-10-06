@@ -1,0 +1,1 @@
+Learning CNN by recognizing chess pieces

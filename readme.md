@@ -17,3 +17,8 @@ e:\Miniconda3\Scripts\conda list -e > requirements.txt
 e:\Miniconda3\Scripts\activate tensorflow_gpuenv
 e:\Miniconda3\Scripts\conda env export > tensorflow_gpuenv.yml
 ```
+
+check nvidia usage
+```
+C:\Program Files\NVIDIA Corporation\NVSMI\nvidia-smi.exe
+```

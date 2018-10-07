@@ -2,7 +2,28 @@ import logging
 
 from skimage import measure
 
+from util.dto import BoundingBox, Contour
+import matplotlib.pyplot as plt
+import numpy as np
+
 logger = logging.getLogger(__name__)
+
+
+def display_image_with_contours(grey_array, contours):
+    # Display the image and plot all contours found
+    fig, ax = plt.subplots()
+
+    if grey_array is not None:
+        ax.imshow(grey_array, interpolation='nearest', cmap=plt.cm.gray)
+
+    for n, contour in enumerate(contours):
+        ax.plot(contour[:, 1], contour[:, 0], linewidth=2)
+
+    ax.axis('image')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    plt.show()
+
 
 def find_contours(
         grey_array, min_width=5, max_width=15,
@@ -14,7 +35,7 @@ def find_contours(
     """
     :return:  iterable of contours in card
     """
-
+    #logger.debug("hello")
     # grey_array[grey_array < 150] = 0
     # grey_array[grey_array >= 150] = 255
 

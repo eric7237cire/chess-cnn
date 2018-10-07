@@ -17,7 +17,7 @@ from sklearn.model_selection import train_test_split
 from config import Config
 
 batch_size = 32
-epochs = 10
+epochs = 7
 
 RUN_NAME = "eric1" + datetime.datetime.now().strftime("_%H_%M")
 
@@ -99,9 +99,9 @@ model.fit(x_train, y_train,
 # Save model and weights
 Config.MODELS_DIR.mkdir(exist_ok=True)
 
-model_path = Config.MODELS_DIR / model_name
-model.save(str(model_path))
-print('Saved trained model at %s ' % model_path)
+chess_model_structure = model.to_json()
+Config.CHESS_PIECE_MODEL_STRUCTURE_PATH.write_text( chess_model_structure )
+model.save_weights( str(Config.CHESS_PIECE_MODEL_WEIGHTS_PATH) )
 
 # Score trained model.
 scores = model.evaluate(x_test, y_test, verbose=1)

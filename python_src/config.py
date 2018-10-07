@@ -12,6 +12,9 @@ class Config(object):
 
     MODELS_DIR = DATA_DIR / "models"
 
+    CHESS_PIECE_MODEL_STRUCTURE_PATH = MODELS_DIR / "chess_piece_structure.json"
+    CHESS_PIECE_MODEL_WEIGHTS_PATH = MODELS_DIR / "chess_piece_weights.h5"
+
     TENSOR_BOARD_LOG_DIR = DATA_DIR / "tb_logs"
 
     SCREENSHOT_DIR = DATA_DIR / "screenshots"

@@ -4,11 +4,9 @@ from pathlib import Path
 import imageio as imageio
 import joblib
 import numpy as np
-from scipy.misc import imresize
-
 from config import Config
+from util.dto import ChessBoard
 from util.file import recreate_dir
-
 
 if __name__ == "__main__":
 
@@ -31,20 +29,12 @@ if __name__ == "__main__":
 
             board_array = board_array.astype(np.uint8)
 
-            print(board_array.dtype)
+            board = ChessBoard(image_array=board_array)
 
             # We don't need the alpha channel
             # board_array = board_array[:, :, 0:3]
 
             print(board_array.shape)
-
-            #board_array = ImageOps.expand(image=board_array, border=Config.IMAGE_VARIATION_MAX_OFFSET, fill=0)
-
-            # And we don't need colors
-            # board_array = color.rgb2gray(board_array)
-
-            square_width = board_array.shape[1] / 8
-            square_height = board_array.shape[0] / 8
 
             if False:
                 plt.imshow(board_array)
@@ -55,47 +45,32 @@ if __name__ == "__main__":
 
             for fen_char, row, col in enum_fen(fen):
 
-                #print(f"Row: {row} Col: {col} {fen_char}")
+                # print(f"Row: {row} Col: {col} {fen_char}")
 
                 for row_offset in range(-Config.IMAGE_VARIATION_MAX_OFFSET, Config.IMAGE_VARIATION_MAX_OFFSET + 1, 1):
                     for col_offset in range(-Config.IMAGE_VARIATION_MAX_OFFSET, Config.IMAGE_VARIATION_MAX_OFFSET + 1,
                                             1):
 
-                        piece_bounds_tuple = (row * square_height + row_offset,
-                             row * square_height + square_height + row_offset,
-                             col * square_width + col_offset,
-                             (col + 1) * square_width + col_offset
-                             )
-                        piece_img_bounds = np.asarray(piece_bounds_tuple)
-                        piece_img_bounds = np.rint(piece_img_bounds)
-                        piece_img_bounds = piece_img_bounds.astype(np.int32)
+                        piece_image = board.get_piece_array(row=row, col=col,
+                                                            row_offset=row_offset,
+                                                            col_offset=col_offset)
 
-                        if np.min( piece_img_bounds ) < 0:
+                        if piece_image is None:
                             continue
-
-                        piece_image = board_array[piece_img_bounds[0]:piece_img_bounds[1],
-                                      piece_img_bounds[2]:piece_img_bounds[3]]
 
                         if False:
                             plt.imshow(piece_image)
                             plt.title(fen_char)
                             plt.show()
 
-                        #print(piece_image.shape)
-
-                        # https://pillow.readthedocs.io/en/latest/handbook/concepts.html#modes
-                        image_resized = imresize(piece_image, Config.PIECE_IMAGE_SHAPE, 'bilinear', 'I')
-
-                        image_resized = image_resized.astype(np.uint8)
-
                         file_name = f"{fen_char}_{Path(raw_data_fn).stem}_{row}_{col}_{row_offset}_{col_offset}.png"
                         file_path = Config.TRAINING_DATA_DIR / file_name
 
-                        imageio.imwrite(file_path, image_resized, "png")
+                        imageio.imwrite(file_path, piece_image, "png")
 
-                        X.append(image_resized)
+                        X.append(piece_image)
 
-                        Y.append( Config.PIECE_TO_CLASS[fen_char] )
+                        Y.append(Config.PIECE_TO_CLASS[fen_char])
 
                         if len(X) % 500 == 0:
                             print(f"X is now {len(X)}")
@@ -105,5 +80,3 @@ if __name__ == "__main__":
 
     joblib.dump(X, Config.TRAINING_DATA_DIR / "X.dat")
     joblib.dump(Y, Config.TRAINING_DATA_DIR / "Y.dat")
-
-

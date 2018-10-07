@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 from PIL import Image, ImageOps, ImageDraw
 
-class Config(object):
 
+class Config(object):
     PROJECT_DIR = Path(__file__).parent.parent
     DATA_DIR = PROJECT_DIR / "data"
     RAW_DATA_DIR = DATA_DIR / "raw_data"
@@ -23,6 +23,10 @@ class Config(object):
     PIECE_LOCATIONS_PATH = RAW_DATA_DIR / "piece_locations.json"
 
     PIECE_IMAGE_SHAPE = (64, 64)
+
+    # Max amt of pixels to shift images during training
+    IMAGE_VARIATION_MAX_OFFSET = 5
+
 
 def retry(retry_count=5, delay=5, allowed_exceptions=()):
     def decorator(f):
@@ -42,12 +46,12 @@ def retry(retry_count=5, delay=5, allowed_exceptions=()):
                 print(f"waiting for {delay} seconds before retyring again")
                 sleep(delay)
 
-
         return wrapper
+
     return decorator
 
-def enum_fen(fen: str) -> Tuple[chr, int, int]:
 
+def enum_fen(fen: str) -> Tuple[chr, int, int]:
     split_fen = fen.split(' ')
 
     fen_piece_locations = split_fen[0]
@@ -80,15 +84,13 @@ def enum_fen(fen: str) -> Tuple[chr, int, int]:
 
 @retry(allowed_exceptions=PermissionError, delay=0.25)
 def recreate_dir(dir: Path):
-
     if not str(dir).startswith(r"E:\git\chess-cnn\data"):
-        raise Exception("Shouldn't delete just anything: "  + str(dir))
+        raise Exception("Shouldn't delete just anything: " + str(dir))
 
     if dir.exists():
         shutil.rmtree(dir)
 
     dir.mkdir(exist_ok=False)
-
 
 
 if __name__ == "__main__":
@@ -103,21 +105,23 @@ if __name__ == "__main__":
             print(raw_data_fn)
 
             board_array: np.array = imageio.imread(Config.RAW_DATA_DIR / raw_data_fn,
-                                         format = "png",
-                                         pilmode = "I",)
-            #as_gray = True)
+                                                   format="png",
+                                                   pilmode="I", )
+            # as_gray = True)
 
             board_array = board_array.astype(np.uint8)
 
             print(board_array.dtype)
 
             # We don't need the alpha channel
-            #board_array = board_array[:, :, 0:3]
+            # board_array = board_array[:, :, 0:3]
 
             print(board_array.shape)
 
+            #board_array = ImageOps.expand(image=board_array, border=Config.IMAGE_VARIATION_MAX_OFFSET, fill=0)
+
             # And we don't need colors
-            #board_array = color.rgb2gray(board_array)
+            # board_array = color.rgb2gray(board_array)
 
             square_width = board_array.shape[1] / 8
             square_height = board_array.shape[0] / 8
@@ -133,26 +137,38 @@ if __name__ == "__main__":
 
                 print(f"Row: {row} Col: {col} {fen_char}")
 
-                piece_image = board_array[int(round(row * square_height)):int(round(row * square_height + square_height)),
-                              int(round(col * square_width)): int(round((col + 1) * square_width))]
+                for row_offset in range(-Config.IMAGE_VARIATION_MAX_OFFSET, Config.IMAGE_VARIATION_MAX_OFFSET + 1, 1):
+                    for col_offset in range(-Config.IMAGE_VARIATION_MAX_OFFSET, Config.IMAGE_VARIATION_MAX_OFFSET + 1,
+                                            1):
 
-                if False:
-                    plt.imshow(piece_image)
-                    plt.title(fen_char)
-                    plt.show()
+                        piece_bounds_tuple = (row * square_height + row_offset,
+                             row * square_height + square_height + row_offset,
+                             col * square_width + col_offset,
+                             (col + 1) * square_width + col_offset
+                             )
+                        piece_img_bounds = np.asarray(piece_bounds_tuple)
+                        piece_img_bounds = np.rint(piece_img_bounds)
+                        piece_img_bounds = piece_img_bounds.astype(np.int32)
 
-                # https://pillow.readthedocs.io/en/latest/handbook/concepts.html#modes
-                image_resized = imresize(piece_image, Config.PIECE_IMAGE_SHAPE, 'bilinear', 'I')
+                        if np.min( piece_img_bounds ) < 0:
+                            continue
 
-                image_resized = image_resized.astype(np.uint8)
+                        piece_image = board_array[piece_img_bounds[0]:piece_img_bounds[1],
+                                      piece_img_bounds[2]:piece_img_bounds[3]]
 
-                image_variations = [
-                    image_resized,
-                ]
+                        if False:
+                            plt.imshow(piece_image)
+                            plt.title(fen_char)
+                            plt.show()
 
-                for idx, img in enumerate(image_variations):
-                    file_name =  f"{fen_char}_{Path(raw_data_fn).stem}_{row}_{col}_{idx}.png"
-                    file_path = Config.TRAINING_DATA_DIR / file_name
+                        #print(piece_image.shape)
 
-                    imageio.imwrite(file_path, img, "png")
+                        # https://pillow.readthedocs.io/en/latest/handbook/concepts.html#modes
+                        image_resized = imresize(piece_image, Config.PIECE_IMAGE_SHAPE, 'bilinear', 'I')
 
+                        image_resized = image_resized.astype(np.uint8)
+
+                        file_name = f"{fen_char}_{Path(raw_data_fn).stem}_{row}_{col}_{row_offset}_{col_offset}.png"
+                        file_path = Config.TRAINING_DATA_DIR / file_name
+
+                        imageio.imwrite(file_path, image_resized, "png")

@@ -24,20 +24,6 @@ class Config(object):
     # Max amt of pixels to shift images during training
     IMAGE_VARIATION_MAX_OFFSET = 5
 
-    PIECE_TO_CLASS = {
-        'k': 0,
-        'K': 0,
-        'q': 1,
-        'Q': 1,
-        'b': 2,
-        'B': 2,
-        'n': 3,
-        'N': 3,
-        'r': 4,
-        'R': 4,
-        'p': 5,
-        'P': 5,
+    CLASS_TO_PIECE = ['k', 'K', 'q', 'Q', 'b', 'B','n', 'N', 'r', 'R', 'p', 'P', '.']
 
-    }
-
-    NUM_CLASSES=6
+    NUM_CLASSES= len(CLASS_TO_PIECE)

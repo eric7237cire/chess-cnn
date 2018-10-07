@@ -7,6 +7,7 @@ import numpy as np
 from config import Config
 from util.dto import ChessBoard
 from util.file import recreate_dir
+from util.chess import enum_fen
 
 if __name__ == "__main__":
 
@@ -43,7 +44,9 @@ if __name__ == "__main__":
 
             fen = d[raw_data_fn]
 
-            for fen_char, row, col in enum_fen(fen):
+            include_spaces = file_index == 4
+
+            for fen_char, row, col in enum_fen(fen, include_empty_spaces=include_spaces):
 
                 # print(f"Row: {row} Col: {col} {fen_char}")
 
@@ -63,14 +66,14 @@ if __name__ == "__main__":
                             plt.title(fen_char)
                             plt.show()
 
-                        file_name = f"{fen_char}_{Path(raw_data_fn).stem}_{row}_{col}_{row_offset}_{col_offset}.png"
+                        file_name = f"{Path(raw_data_fn).stem}_{row}_{col}_{fen_char}_{row_offset}_{col_offset}.png"
                         file_path = Config.TRAINING_DATA_DIR / file_name
 
                         imageio.imwrite(file_path, piece_image, "png")
 
                         X.append(piece_image)
 
-                        Y.append(Config.PIECE_TO_CLASS[fen_char])
+                        Y.append(Config.CLASS_TO_PIECE.index(fen_char))
 
                         if len(X) % 500 == 0:
                             print(f"X is now {len(X)}")

@@ -45,7 +45,7 @@ chessboard_img = contours[0].bounding_box.clip_2d_array(image_yx_array=ss_array)
 border_width = 16
 chessboard_img = chessboard_img[ border_width: -border_width, border_width: -border_width]
 
-display_image_with_contours(grey_array=chessboard_img, contours=[])
+#display_image_with_contours(grey_array=chessboard_img, contours=[])
 #display_image_with_contours(ss_array, [c.points_array for c in contours])
 
 
@@ -60,18 +60,27 @@ display_image_with_contours(grey_array=chessboard_img, contours=[])
 
 model_structure = Config.CHESS_PIECE_MODEL_STRUCTURE_PATH.read_text()
 model = model_from_json(model_structure)
+model.load_weights(Config.CHESS_PIECE_MODEL_WEIGHTS_PATH)
 
 board = ChessBoard(chessboard_img)
 
-X = []
+pieces = []
 
 for row in range(0, 8):
     for col in range(0, 8):
-        X.append(board.get_piece_array(row,col))
+        pieces.append(board.get_piece_array(row,col))
 
-X = np.stack(X, axis=0)
+X = np.stack(pieces, axis=0)
 X = X.reshape(list(X.shape) + [1])
 
 Y = model.predict(X)
 
-print(Y)
+for idx in range(0, 64):
+    row = int(idx / 8)
+    col = idx % 8
+
+    max_cat = np.argmax(Y[idx])
+    score = Y[idx][max_cat]
+    print(f"Row: {row} Col: {col} Max Category: {Config.CLASS_TO_PIECE[max_cat]} Score: {score}")
+
+    #display_image_with_contours(grey_array=pieces[idx], contours=[])

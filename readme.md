@@ -29,3 +29,7 @@ open tensorboard
 e:\miniconda3\scripts\activate tensorflow_gpuenv
 tensorboard --logdir .\data\tb_logs
 ```
+
+
+Links: https://github.com/Elucidation/tensorflow_chessbot
+https://github.com/geaxgx/playing-card-detection

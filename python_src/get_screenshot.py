@@ -1,4 +1,5 @@
 import logging
+import win32clipboard
 from pathlib import Path
 from typing import List
 
@@ -75,12 +76,44 @@ X = X.reshape(list(X.shape) + [1])
 
 Y = model.predict(X)
 
+fen_str = ""
+n_spaces = 0
+
 for idx in range(0, 64):
     row = int(idx / 8)
     col = idx % 8
 
     max_cat = np.argmax(Y[idx])
     score = Y[idx][max_cat]
-    print(f"Row: {row} Col: {col} Max Category: {Config.CLASS_TO_PIECE[max_cat]} Score: {score}")
+
+    piece = Config.CLASS_TO_PIECE[max_cat]
+    print(f"Row: {row} Col: {col} Max Category: {piece} Score: {score}")
+
+    if row > 0 and col == 0 :
+        if n_spaces > 0:
+            fen_str += str(n_spaces)
+            n_spaces = 0
+        fen_str = fen_str + '/'
+
+    if piece == '.':
+        n_spaces += 1
+    else:
+        if n_spaces > 0:
+            fen_str += str(n_spaces)
+            n_spaces = 0
+        fen_str += piece
+
 
     #display_image_with_contours(grey_array=pieces[idx], contours=[])
+if n_spaces > 0:
+    fen_str += str(n_spaces)
+    n_spaces = 0
+
+fen_str += " w - - 0 0"
+
+print(fen_str)
+
+win32clipboard.OpenClipboard()
+win32clipboard.EmptyClipboard()
+win32clipboard.SetClipboardText(fen_str)
+win32clipboard.CloseClipboard()

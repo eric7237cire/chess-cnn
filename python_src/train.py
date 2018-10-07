@@ -89,7 +89,7 @@ model.fit(x_train, y_train,
           validation_data=(x_test, y_test),
           shuffle=True,
           verbose=2,
-validation_split=0.01,
+          validation_split=0.01,
           callbacks=[
               TensorBoard(log_dir=str(Config.TENSOR_BOARD_LOG_DIR / f'chess_pieces/run_{RUN_NAME}'), histogram_freq=0,
                           write_graph=True, write_images=True)
@@ -97,10 +97,10 @@ validation_split=0.01,
           )
 
 # Save model and weights
-Config.MODELS_DIR.mkdir(exists_ok=True)
+Config.MODELS_DIR.mkdir(exist_ok=True)
 
 model_path = Config.MODELS_DIR / model_name
-model.save(model_path)
+model.save(str(model_path))
 print('Saved trained model at %s ' % model_path)
 
 # Score trained model.

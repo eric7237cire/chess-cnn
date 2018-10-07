@@ -11,6 +11,7 @@ dependencies:
   - cudnn=7.1.4=cuda9.0_0
   - freetype=2.9.1=ha9979f8_1
   - gast=0.2.0=py36_0
+  - geos=3.6.2=h9ef7328_2
   - grpcio=1.12.1=py36h1a1b453_0
   - icc_rt=2017.0.4=h97af966_0
   - intel-openmp=2019.0=118
@@ -29,7 +30,9 @@ dependencies:
   - pip=10.0.1=py36_0
   - protobuf=3.6.0=py36he025d50_0
   - python=3.6.6=hea74fb7_0
+  - pywin32=223=py36hfa6e2cd_1
   - setuptools=40.4.3=py36_0
+  - shapely=1.6.4=py36hc90234e_0
   - six=1.11.0=py36_1
   - tensorboard=1.10.0=py36he025d50_0
   - tensorflow=1.10.0=gpu_py36h3514669_0

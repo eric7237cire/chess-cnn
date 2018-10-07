@@ -14,6 +14,8 @@ class Config(object):
 
     TENSOR_BOARD_LOG_DIR = DATA_DIR / "tb_logs"
 
+    SCREENSHOT_DIR = DATA_DIR / "screenshots"
+
     PIECE_IMAGE_SHAPE = (64, 64)
 
     # Max amt of pixels to shift images during training

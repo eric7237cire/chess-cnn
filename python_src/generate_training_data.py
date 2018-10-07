@@ -9,6 +9,8 @@ from scipy.misc import imresize
 from config import Config
 from util.file import recreate_dir
 
+from sklearn.model_selection import train_test_split
+
 if __name__ == "__main__":
 
     recreate_dir(Config.TRAINING_DATA_DIR)

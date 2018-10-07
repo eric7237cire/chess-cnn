@@ -12,9 +12,10 @@ e:\miniconda3\scripts\activate tensorflow_gpuenv
 ```
 
 ```
+e:\miniconda3\scripts\activate tensorflow_gpuenv
+
 e:\Miniconda3\Scripts\conda list -e > requirements.txt
 
-e:\Miniconda3\Scripts\activate tensorflow_gpuenv
 e:\Miniconda3\Scripts\conda env export > tensorflow_gpuenv.yml
 ```
 

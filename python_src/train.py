@@ -1,9 +1,10 @@
-'''Train a simple deep CNN on the CIFAR10 small images dataset.
-It gets to 75% validation accuracy in 25 epochs, and 79% after 50 epochs.
-(it's still underfitting at that point, though).
-'''
+"""
+Training
+"""
 
 from __future__ import print_function
+
+import joblib
 import keras
 from keras.datasets import cifar10
 from keras.preprocessing.image import ImageDataGenerator
@@ -12,6 +13,8 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 import os
 
+from config import Config
+
 batch_size = 32
 num_classes = 6
 epochs = 100
@@ -19,6 +22,12 @@ epochs = 100
 num_predictions = 20
 save_dir = os.path.join(os.getcwd(), 'saved_models')
 model_name = 'keras_cifar10_trained_model.h5'
+
+X = joblib.load(Config.TRAINING_DATA_DIR / "X.dat")
+Y = joblib.load(Config.TRAINING_DATA_DIR / "Y.dat")
+
+X_train, X_test, y_train, y_test = train_test_split(
+...     X, y, test_size=0.33, random_state=42)
 
 # The data, split between train and test sets:
 (x_train, y_train), (x_test, y_test) = cifar10.load_data()

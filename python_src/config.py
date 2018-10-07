@@ -1,3 +1,5 @@
+from pathlib import Path
+
 
 class Config(object):
     PROJECT_DIR = Path(__file__).parent.parent
@@ -7,6 +9,10 @@ class Config(object):
     TRAINING_DATA_DIR = DATA_DIR / "training_data"
 
     PIECE_LOCATIONS_PATH = RAW_DATA_DIR / "piece_locations.json"
+
+    MODELS_DIR = DATA_DIR / "models"
+
+    TENSOR_BOARD_LOG_DIR = DATA_DIR / "tb_logs"
 
     PIECE_IMAGE_SHAPE = (64, 64)
 
@@ -28,3 +34,5 @@ class Config(object):
         'P': 5,
 
     }
+
+    NUM_CLASSES=6

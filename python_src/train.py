@@ -4,40 +4,42 @@ Training
 
 from __future__ import print_function
 
+import datetime
+
 import joblib
 import keras
-from keras.datasets import cifar10
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.callbacks import TensorBoard
 from keras.layers import Conv2D, MaxPooling2D
-import os
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.models import Sequential
+from sklearn.model_selection import train_test_split
 
 from config import Config
 
 batch_size = 32
-num_classes = 6
-epochs = 100
+epochs = 10
+
+RUN_NAME = "eric1" + datetime.datetime.now().strftime("_%H_%M")
 
 num_predictions = 20
-save_dir = os.path.join(os.getcwd(), 'saved_models')
-model_name = 'keras_cifar10_trained_model.h5'
+
+model_name = 'keras_chess_trained_model.h5'
 
 X = joblib.load(Config.TRAINING_DATA_DIR / "X.dat")
 Y = joblib.load(Config.TRAINING_DATA_DIR / "Y.dat")
 
-X_train, X_test, y_train, y_test = train_test_split(
-...     X, y, test_size=0.33, random_state=42)
+# CNN networks expect 4th dimension to be channel
+# (batch, height, width, channels)
+X = X.reshape(list(X.shape) + [1])
+
+x_train, x_test, y_train, y_test = train_test_split(
+    X, Y, test_size=0.33, random_state=42)
 
 # The data, split between train and test sets:
-(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
 print('x_train shape:', x_train.shape)
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
-
-# Convert class vectors to binary class matrices.
-y_train = keras.utils.to_categorical(y_train, num_classes)
-y_test = keras.utils.to_categorical(y_test, num_classes)
 
 model = Sequential()
 model.add(Conv2D(32, (3, 3), padding='same',
@@ -59,7 +61,7 @@ model.add(Flatten())
 model.add(Dense(512))
 model.add(Activation('relu'))
 model.add(Dropout(0.5))
-model.add(Dense(num_classes))
+model.add(Dense(Config.NUM_CLASSES))
 model.add(Activation('softmax'))
 
 # initiate RMSprop optimizer
@@ -72,21 +74,32 @@ model.compile(loss='categorical_crossentropy',
 
 x_train = x_train.astype('float32')
 x_test = x_test.astype('float32')
+
+# Convert class vectors to binary class matrices.
+y_train = keras.utils.to_categorical(y_train, Config.NUM_CLASSES)
+y_test = keras.utils.to_categorical(y_test, Config.NUM_CLASSES)
+
 x_train /= 255
 x_test /= 255
 
-print('Not using data augmentation.')
+print('Fitting model')
 model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=epochs,
           validation_data=(x_test, y_test),
-          shuffle=True)
-
+          shuffle=True,
+          verbose=2,
+validation_split=0.01,
+          callbacks=[
+              TensorBoard(log_dir=str(Config.TENSOR_BOARD_LOG_DIR / f'chess_pieces/run_{RUN_NAME}'), histogram_freq=0,
+                          write_graph=True, write_images=True)
+          ]
+          )
 
 # Save model and weights
-if not os.path.isdir(save_dir):
-    os.makedirs(save_dir)
-model_path = os.path.join(save_dir, model_name)
+Config.MODELS_DIR.mkdir(exists_ok=True)
+
+model_path = Config.MODELS_DIR / model_name
 model.save(model_path)
 print('Saved trained model at %s ' % model_path)
 

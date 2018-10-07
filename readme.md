@@ -23,3 +23,9 @@ check nvidia usage
 ```
 C:\Program Files\NVIDIA Corporation\NVSMI\nvidia-smi.exe
 ```
+
+open tensorboard
+```
+e:\miniconda3\scripts\activate tensorflow_gpuenv
+tensorboard --logdir .\data\tb_logs
+```

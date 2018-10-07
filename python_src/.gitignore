@@ -1,2 +1,3 @@
 *.dat
 logs
+.mypy_cache

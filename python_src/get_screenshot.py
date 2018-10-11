@@ -26,8 +26,8 @@ Config.SCREENSHOT_DIR.mkdir(exist_ok=True)
 
 screenshot_path: Path = Config.SCREENSHOT_DIR / 'ss.png'
 
-if not screenshot_path.exists():
-    capture_screenshot(windows_title="Chess Tactics",
+#if not screenshot_path.exists():
+capture_screenshot(windows_title="Chess Tactics",
                        output_file_path=str(screenshot_path))
 
 ss_array: np.array = imageio.imread(screenshot_path, format="png", pilmode="I")

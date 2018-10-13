@@ -37,4 +37,5 @@ https://github.com/geaxgx/playing-card-detection
 open jupyter
 ```
 e:\miniconda3\scripts\activate tensorflow_gpuenv
+jupyter notebook
 ```

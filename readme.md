@@ -39,3 +39,8 @@ open jupyter
 e:\miniconda3\scripts\activate tensorflow_gpuenv
 jupyter notebook
 ```
+
+Text links
+
+https://stackoverflow.com/questions/23506105/extracting-text-opencv
+https://github.com/LinxiFan/LiteOCR/blob/master/liteocr/ocr.py

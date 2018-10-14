@@ -44,3 +44,10 @@ Text links
 
 https://stackoverflow.com/questions/23506105/extracting-text-opencv
 https://github.com/LinxiFan/LiteOCR/blob/master/liteocr/ocr.py
+
+MSER / SWT python implementation with opencv: https://github.com/azmiozgen/text-detection
+
+
+HOG 
+https://www.quora.com/How-can-I-extract-text-from-a-PNG-image-using-Python
+
